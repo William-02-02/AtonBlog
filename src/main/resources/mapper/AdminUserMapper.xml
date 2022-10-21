@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyh.AtonBlog.dao.AdminUserMapper">
+	<resultMap id="adminUserResultMap" type="adminUser">
+		<id column="admin_user_id" property="adminUserId"></id>
+		<result column="login_user_name" property="loginUserName"/>
+		<result column="login_password" property="loginPassword"/>
+		<result column="nick_name" property="nickName"/>
+		<result column="locked" property="locked"/>
+	</resultMap>
+	
+	
+	<!--login-->
+	<select id="login" resultMap="adminUserResultMap" >
+		select * from tb_admin_user 
+		where login_user_name=#{userName} and login_password=#{password}
+	</select>
+	
+	<!--根据id查询用户-->
+	<select id="selectByPrimaryKey" resultMap="adminUserResultMap">
+		select * from tb_admin_user where admin_user_id=#{adminUserId}
+	</select>
+	
+	<!--查询所有用户-->
+	<select id="selectAllUser" resultMap="adminUserResultMap">
+		select * from tb_admin_user
+	</select>
+	
+	<!--添加用户 all-->
+	<insert id="addUser" parameterType="adminUser">
+		insert into tb_admin_user(admin_user_id, login_user_name, login_password, nick_name, locked) 
+		VALUES (#{adminUserId},#{loginUserName},#{loginPassword},#{nickName},#{locked})
+	</insert>
+	
+	<!--添加用户 selective-->
+	<insert id="addUserSelective" parameterType="adminUser">
+		insert into tb_admin_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="adminUserId != null"> admin_user_id,</if>
+			<if test="loginUserName != null"> login_user_name,</if>
+			<if test="loginPassword != null"> login_password,</if>
+			<if test="nickName != null"> nick_name,</if>
+			<if test="locked != null"> locked,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="adminUserId != null"> #{adminUserId},</if>
+			<if test="loginUserName != null"> #{login_user_name},</if>
+			<if test="loginPassword != null"> #{login_password},</if>
+			<if test="nickName != null"> #{nick_name},</if>
+			<if test="locked != null"> #{locked},</if>
+		</trim>
+	</insert>
+	
+	<!--更新用户-->
+	<update id="updateByPrimaryKey" parameterType="adminUser">
+		update tb_admin_user
+		set login_user_name=#{loginUserName},login_password=#{loginPassword},nick_name=#{nickName},locked=#{locked}
+		where admin_user_id = #{adminUserId}
+	</update>
+	
+	<!--选择更新部分-->
+	<update id="updateByPrimaryKeySelective" parameterType="adminUser">
+		update tb_admin_user
+		<set>
+			<if test="loginUserName != null">
+				login_user_name = #{loginUserName,jdbcType=VARCHAR},
+			</if>
+			<if test="loginPassword != null">
+				login_password = #{loginPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="nickName != null">
+				nick_name = #{nickName,jdbcType=VARCHAR},
+			</if>
+			<if test="locked != null">
+				locked = #{locked,jdbcType=TINYINT},
+			</if>
+		</set>
+		where admin_user_id = #{adminUserId,jdbcType=INTEGER}
+	</update>
+	
+	<!--删除用户-->
+	<delete id="deleteById" parameterType="int">
+		delete from tb_admin_user where admin_user_id = #{adminUserId}
+	</delete>
+	<select id="selectByLoginUserName" resultMap="adminUserResultMap">
+		select
+		*
+		from tb_admin_user
+		where
+		login_user_name = #{loginUserName,jdbcType=VARCHAR}
+	</select>
+	
+	
+	<!--关联的嵌套结果映射-->
+	<!--<select id="getStuInfo2" resultMap="StuResMap2">-->
+	<!--	select s.id sid , s.name sname, t.tname tname-->
+	<!--	from student s-->
+	<!--	join teacher t on s.tid = t.tid-->
+	<!--</select>-->
+	
+	<!--<resultMap id="StuResMap2" type="Student">-->
+	<!--	<result property="id" column="sid"></result>-->
+	<!--	<result property="name" column="sname"></result>-->
+	<!--	<association property="teacher" javaType="Teacher">-->
+	<!--		<result property="tname" column="tname"></result>-->
+	<!--	</association>-->
+	<!--</resultMap>-->
+	
+	
+	<!--结果嵌套映射-->
+	
+	<!--<select id="getTeacher2" resultMap="getTeaMap2">-->
+	<!--	select t.tid tid ,t.tname tname, s.name sname-->
+	<!--	from teacher t-->
+	<!--	join student s on t.tid = s.tid and t.tid = #{tid}-->
+	
+	<!--</select>-->
+	
+	<!--<resultMap id="getTeaMap2" type="teacher">-->
+	<!--	<id property="tid" column="tid"></id>-->
+	<!--	<result property="tname" column="tname"></result>-->
+	<!--	-->
+	<!--	<collection property="Students" ofType="student">-->
+	<!--		<id property="id" column="id"></id>-->
+	<!--		<result property="tid" column="tid"></result>-->
+	<!--		<result property="name" column="sname"></result>-->
+	<!--	</collection>-->
+	<!--</resultMap>-->
+
+
+</mapper>

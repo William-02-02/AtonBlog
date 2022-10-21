@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyh.AtonBlog.dao.ConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.lyh.AtonBlog.pojo.Config">
+            <id property="configName" column="config_name" jdbcType="VARCHAR"/>
+            <result property="configValue" column="config_value" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        config_name,config_value,create_time,
+        update_time
+    </sql>
+
+    <select id="selectByPrimaryKey"  resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from tb_config
+        where  config_name = #{configName,jdbcType=VARCHAR} 
+    </select>
+    <select id="selectAllConfig" resultMap="BaseResultMap">
+        select * from tb_config
+    </select>
+    
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from tb_config
+        where  config_name = #{configName,jdbcType=VARCHAR} 
+    </delete>
+    <delete id="deleteBatch">
+        delete from tb_config
+        where  config_name in
+            <foreach collection="array" item="configName" open="(" separator="," close=")">
+                #{configName,jdbcType=VARCHAR} 
+            </foreach>
+             
+    </delete>
+    
+    <insert id="insert"  parameterType="com.lyh.AtonBlog.pojo.Config" useGeneratedKeys="true">
+        insert into tb_config
+        ( config_name,config_value,create_time
+        ,update_time)
+        values (#{configName,jdbcType=VARCHAR},#{configValue,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP}
+        ,#{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" keyColumn="config_name" keyProperty="configName" parameterType="com.lyh.AtonBlog.pojo.Config" useGeneratedKeys="true">
+        insert into tb_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="configName != null">config_name,</if>
+                <if test="configValue != null">config_value,</if>
+                <if test="createTime != null">create_time,</if>
+                <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="configName != null"> #{configName,jdbcType=VARCHAR},</if>
+                <if test="configValue != null"> #{configValue,jdbcType=VARCHAR},</if>
+                <if test="createTime != null"> #{createTime,jdbcType=TIMESTAMP},</if>
+                <if test="updateTime != null"> #{updateTime,jdbcType=TIMESTAMP},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lyh.AtonBlog.pojo.Config">
+        update tb_config
+        <set>
+                <if test="configValue != null">
+                    config_value = #{configValue,jdbcType=VARCHAR},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="updateTime != null">
+                    update_time = #{updateTime,jdbcType=TIMESTAMP},
+                </if>
+        </set>
+        where   config_name = #{configName,jdbcType=VARCHAR} 
+    </update>
+    
+    <update id="updateBatch" parameterType="config">
+        update tb_config
+            set config_value = case config_name
+            <foreach collection="list" item="value">
+                when #{value.configName} then #{value.configValue}
+            </foreach>
+            end,
+            update_time = case config_name
+             <foreach collection="list" item="value">
+                 when #{value.configName} then #{value.updateTime}
+             </foreach>
+            end
+        where config_name in 
+        <foreach collection="list" item="value" open="(" separator="," close=")">
+            #{value.configName}
+        </foreach>
+
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lyh.AtonBlog.pojo.Config">
+        update tb_config
+        set 
+            config_value =  #{configValue,jdbcType=VARCHAR},
+            create_time =  #{createTime,jdbcType=TIMESTAMP},
+            update_time =  #{updateTime,jdbcType=TIMESTAMP}
+        where   config_name = #{configName,jdbcType=VARCHAR} 
+    </update>
+</mapper>

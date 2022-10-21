@@ -1,0 +1,18 @@
+server:
+  port: 28083
+  
+  
+spring:
+  datasource:
+    password: lyh010034
+    username: root
+    url: jdbc:mysql://localhost:3306/aton_blog_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+    
+mybatis:
+  type-aliases-package: com.lyh.AtonBlog.pojo
+  mapper-locations: classpath:mapper/*Mapper.xml
+

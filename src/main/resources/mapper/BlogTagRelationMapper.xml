@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyh.AtonBlog.dao.BlogTagRelationMapper">
+
+    <resultMap id="BaseResultMap" type="com.lyh.AtonBlog.pojo.BlogTagRelation">
+            <id property="relationId" column="relation_id" jdbcType="BIGINT"/>
+            <result property="blogId" column="blog_id" jdbcType="BIGINT"/>
+            <result property="tagId" column="tag_id" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        relation_id,blog_id,tag_id,
+        create_time
+    </sql>
+    
+    <delete id="deleteBatchByBlogId">
+        delete from tb_blog_tag_relation
+        where  blog_id in
+        <foreach collection="array" item="relationId" open="(" separator="," close=")">
+            #{relationId,jdbcType=BIGINT}
+        </foreach>
+    
+    </delete>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from tb_blog_tag_relation
+        where  relation_id = #{relationId,jdbcType=BIGINT} 
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from tb_blog_tag_relation
+        where  relation_id = #{relationId,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteBatch">
+        delete from tb_blog_tag_relation
+        where  relation_id in
+            <foreach collection="array" item="relationId" open="(" separator="," close=")">
+                #{relationId,jdbcType=BIGINT} 
+            </foreach>
+             
+    </delete>
+    
+    <insert id="insert"  parameterType="com.lyh.AtonBlog.pojo.BlogTagRelation" useGeneratedKeys="true">
+        insert into tb_blog_tag_relation
+        ( relation_id,blog_id,tag_id
+        ,create_time)
+        values (#{relationId,jdbcType=BIGINT},#{blogId,jdbcType=BIGINT},#{tagId,jdbcType=INTEGER}
+        ,#{createTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.lyh.AtonBlog.pojo.BlogTagRelation" useGeneratedKeys="true">
+        insert into tb_blog_tag_relation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="relationId != null">relation_id,</if>
+                <if test="blogId != null">blog_id,</if>
+                <if test="tagId != null">tag_id,</if>
+                <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="relationId != null"> #{relationId,jdbcType=BIGINT},</if>
+                <if test="blogId != null"> #{blogId,jdbcType=BIGINT},</if>
+                <if test="tagId != null"> #{tagId,jdbcType=INTEGER},</if>
+                <if test="createTime != null"> #{createTime,jdbcType=TIMESTAMP},</if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.lyh.AtonBlog.pojo.BlogTagRelation">
+        update tb_blog_tag_relation
+        <set>
+                <if test="blogId != null">
+                    blog_id = #{blogId,jdbcType=BIGINT},
+                </if>
+                <if test="tagId != null">
+                    tag_id = #{tagId,jdbcType=INTEGER},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime,jdbcType=TIMESTAMP},
+                </if>
+        </set>
+        where   relation_id = #{relationId,jdbcType=BIGINT} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lyh.AtonBlog.pojo.BlogTagRelation">
+        update tb_blog_tag_relation
+        set 
+            blog_id =  #{blogId,jdbcType=BIGINT},
+            tag_id =  #{tagId,jdbcType=INTEGER},
+            create_time =  #{createTime,jdbcType=TIMESTAMP}
+        where   relation_id = #{relationId,jdbcType=BIGINT} 
+    </update>
+	<insert id="insertBatch">
+		insert into tb_blog_tag_relation(blog_id,tag_id)
+		values
+		<foreach collection="blogTagRelationCollection" item="item" separator=",">
+			(#{item.blogId,jdbcType=NUMERIC},#{item.tagId,jdbcType=NUMERIC})
+		</foreach>
+	</insert>
+</mapper>

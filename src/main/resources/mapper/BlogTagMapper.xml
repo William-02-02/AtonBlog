@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lyh.AtonBlog.dao.BlogTagMapper">
+
+    <resultMap id="BaseResultMap" type="com.lyh.AtonBlog.pojo.BlogTag">
+            <id property="tagId" column="tag_id" jdbcType="INTEGER"/>
+            <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
+            <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    
+    <resultMap id="TagCountMap" type="com.lyh.AtonBlog.pojo.BlogTagCount">
+        <id property="tagId" column="tag_id" jdbcType="INTEGER"/>
+        <result property="tagName" column="tag_name" jdbcType="VARCHAR"/>
+        <result property="tagCount" column="num" jdbcType="TINYINT"/>
+    </resultMap>
+    
+    <sql id="Base_Column_List">
+        tag_id,tag_name,is_deleted,
+        create_time
+    </sql>
+    
+    
+    <!--自定义-->
+    
+    <select id="getTagWithCount" resultMap="TagCountMap">
+        select t.* ,g.tag_name from
+               (select tag_id,count(*) as num
+                from tb_blog_tag_relation
+                group by tag_id
+                order by num desc ,tag_id asc) t
+        join tb_blog_tag g
+        on t.tag_id = g.tag_id
+        where g.is_deleted = 0
+    </select>
+    
+    <select id="getTagList" parameterType="map" resultMap="BaseResultMap">
+        select * from tb_blog_tag
+        where is_deleted = 0
+        <if test="keyword != null">
+            and tag_name like concat('%',#{keyword},'%')
+        </if>
+        order by tag_id asc,tag_name asc
+        <if test="start != null and pageVolume != null">
+            limit #{start},#{pageVolume}
+        </if>
+    </select>
+    
+    
+    <update id="deleteBatch">
+        update tb_blog_tag
+        set is_deleted = 1
+        where tag_id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+    
+    <select id="getTotalTagCount" parameterType="map" resultType="java.lang.Integer">
+        select count(*) from tb_blog_tag
+        where is_deleted = 0
+        <if test="keyword != null">
+            and tag_name like concat('%',#{keyword},'%')
+        </if>
+    </select>
+    
+    
+    <select id="selectByTagName" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from tb_blog_tag where is_deleted=0 and tag_name=#{tagName}
+    </select>
+    
+    <!--模版生成-->
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from tb_blog_tag
+        where  tag_id = #{tagId,jdbcType=INTEGER} 
+    </select>
+    
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from tb_blog_tag
+        where  tag_id = #{tagId,jdbcType=INTEGER} 
+    </delete>
+    <insert id="insert" keyColumn="tag_id" keyProperty="tagId" parameterType="com.lyh.AtonBlog.pojo.BlogTag" useGeneratedKeys="true">
+        insert into tb_blog_tag
+        ( tag_id,tag_name,is_deleted
+        ,create_time)
+        values (#{tagId,jdbcType=INTEGER},#{tagName,jdbcType=VARCHAR},#{isDeleted,jdbcType=TINYINT}
+        ,#{createTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" keyColumn="tag_id" keyProperty="tagId" parameterType="com.lyh.AtonBlog.pojo.BlogTag" useGeneratedKeys="true">
+        insert into tb_blog_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="tagId != null">tag_id,</if>
+                <if test="tagName != null">tag_name,</if>
+                <if test="isDeleted != null">is_deleted,</if>
+                <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="tagId != null"> #{tagId,jdbcType=INTEGER},</if>
+                <if test="tagName != null"> #{tagName,jdbcType=VARCHAR},</if>
+                <if test="isDeleted != null"> #{isDeleted,jdbcType=TINYINT},</if>
+                <if test="createTime != null"> #{createTime,jdbcType=TIMESTAMP},</if>
+        </trim>
+    </insert>
+	<insert id="insertByTagName" >
+        insert into tb_blog_tag (tag_name) 
+        VALUES (#{tagName})
+        
+    </insert>
+    <insert id="BatchInsertTagList" parameterType="list" keyProperty="tagId" keyColumn="tag_id" useGeneratedKeys="true">
+        insert into tb_blog_tag (tag_name) 
+        VALUES 
+        <foreach collection="list" item="item" separator=",">
+            (#{item.tagName})
+        </foreach>
+        
+    </insert>
+    
+    <update id="updateByPrimaryKeySelective" parameterType="com.lyh.AtonBlog.pojo.BlogTag">
+        update tb_blog_tag
+        <set>
+                <if test="tagName != null">
+                    tag_name = #{tagName,jdbcType=VARCHAR},
+                </if>
+                <if test="isDeleted != null">
+                    is_deleted = #{isDeleted,jdbcType=TINYINT},
+                </if>
+                <if test="createTime != null">
+                    create_time = #{createTime,jdbcType=TIMESTAMP},
+                </if>
+        </set>
+        where   tag_id = #{tagId,jdbcType=INTEGER} 
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.lyh.AtonBlog.pojo.BlogTag">
+        update tb_blog_tag
+        set 
+            tag_name =  #{tagName,jdbcType=VARCHAR},
+            is_deleted =  #{isDeleted,jdbcType=TINYINT},
+            create_time =  #{createTime,jdbcType=TIMESTAMP}
+        where   tag_id = #{tagId,jdbcType=INTEGER} 
+    </update>
+
+</mapper>
